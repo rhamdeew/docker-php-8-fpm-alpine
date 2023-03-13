@@ -1,0 +1,25 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Docker login
+      env:
+        DOCKER_USER: ${{secrets.DOCKER_USER}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag rhamdeew/docker-php-8-fpm-alpine
+    - name: Docker push
+      run: docker push ${{secrets.DOCKER_USER}}/docker-php-8-fpm-alpine
